@@ -1,6 +1,9 @@
 const fs = require('fs')
 const http = require('http')
 const url = require('url')
+
+const replaceTemplate = require('./modules/replaceTemplate')
+
 // Synchronous way
 // const textIn = fs.readFileSync('./txt/input.txt')
 // console.log(textIn)
@@ -35,23 +38,14 @@ const templateCard = fs.readFileSync(`${__dirname}/templates/template-card.html`
 const templateProduct = fs.readFileSync(`${__dirname}/templates/product-template.html`, 'utf-8')
 const dataObj = JSON.parse(data)
 
-const replaceTemplate = (template, product) => {
-  let output = template.replace(/{%PRODUCTNAME%}/g, product.productName)
-  output = output.replace(/{%IMAGE%}/g, product.image)
-  output = output.replace(/{%PRICE%}/g, product.price)
-  output = output.replace(/{%NUTRIENTS%}/g, product.nutrients)
-  output = output.replace(/{%QUANTITY%}/g, product.quantity)
-  output = output.replace(/{%DESCRIPTION%}/g, product.description)
-  output = output.replace(/{%ID%}/g, product.id)
 
-  if (!product.organic) output.replace(/{%NOT_ORGANIC%}/g, 'not organic')
-    return output
-}
 
 const server = http.createServer((req, res) => { 
-  const pathName = req.url
 
-  if (pathName === '/' || pathName === '/overview') {
+  const { pathname, query } = url.parse(req.url, true)
+
+
+  if (pathname === '/' || pathname === '/overview') {
     res.writeHead(200, { 'Content-Type': 'text/html' })
 
     const cardsHtml = dataObj.map((el) => replaceTemplate(templateCard, el)).join('')
@@ -59,11 +53,15 @@ const server = http.createServer((req, res) => {
     res.end(output)
 
     // Product pages
-  } else if (pathName === '/product'){
-    res.end('This is the product')
+  } else if (pathname === '/product'){
+
+    res.writeHead(200, { 'Content-Type': 'text/html' })
+    const product = dataObj[query.id]
+    const output = replaceTemplate(templateProduct, product)
+    res.end(output)
 
     // API
-  } else if (pathName === '/api'){
+  } else if (pathname === '/api'){
     res.writeHead(200, { 'Content-Type': 'application/json' })
     res.end(data)
   } else {
