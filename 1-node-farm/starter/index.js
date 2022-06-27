@@ -3,6 +3,7 @@ const http = require('http')
 const url = require('url')
 
 const replaceTemplate = require('./modules/replaceTemplate')
+const slugify = require('slugify')
 
 // Synchronous way
 // const textIn = fs.readFileSync('./txt/input.txt')
@@ -38,6 +39,20 @@ const templateCard = fs.readFileSync(`${__dirname}/templates/template-card.html`
 const templateProduct = fs.readFileSync(`${__dirname}/templates/product-template.html`, 'utf-8')
 const dataObj = JSON.parse(data)
 
+<<<<<<< HEAD:1-node-farm/starter/app.js
+=======
+const slugs = dataObj.map(el => slugify(el.productName, { lower: true }))
+console.log(slugs)
+
+const replaceTemplate = (template, product) => {
+  let output = template.replace(/{%PRODUCTNAME%}/g, product.productName)
+  output = output.replace(/{%IMAGE%}/g, product.image)
+  output = output.replace(/{%PRICE%}/g, product.price)
+  output = output.replace(/{%NUTRIENTS%}/g, product.nutrients)
+  output = output.replace(/{%QUANTITY%}/g, product.quantity)
+  output = output.replace(/{%DESCRIPTION%}/g, product.description)
+  output = output.replace(/{%ID%}/g, product.id)
+>>>>>>> d42989323f8950824408f6102ca1a646f592be9f:1-node-farm/starter/index.js
 
 
 const server = http.createServer((req, res) => { 
